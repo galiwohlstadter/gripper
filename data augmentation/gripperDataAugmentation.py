@@ -227,3 +227,22 @@ class GripperDataAugmentation:
         path, filename = os.path.split(img_filename)
         filename, ext = os.path.splitext(filename)
         return [path, filename, ext]
+
+def main():
+    # create 1000 images per image
+    num_of_images_per_image = 1 #1000
+    num_of_images_per_folder = 1 #100
+
+    for folder_num in range(0, 11):
+        folder_num_str = format(folder_num, '02')
+        file_path = 'D:\Gali\CS231N_Project\CornellDataset\\' + folder_num_str
+        output_file_path = 'D:\Gali\CS231N_Project\CornellDataset\\data_augmentation\\' + folder_num_str
+        for img_num in range(0, num_of_images_per_folder):
+            img_num_str = folder_num_str + format(img_num, '02')
+            myobject = GripperDataAugmentation(file_path, img_num_str, output_file_path);
+            for i in range(0, num_of_images_per_image):
+                myobject.randomize()
+                myobject.data_augment()
+
+if __name__ == "__main__":
+    main()
