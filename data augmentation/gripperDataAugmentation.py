@@ -1,3 +1,4 @@
+
 # pip install scikit-image, numpy, matplotlib
 import skimage
 from skimage import data, io, transform
@@ -48,7 +49,7 @@ class GripperDataAugmentation:
         self.file_path = file_path
         self.img_num = img_num
         self.img_filename = os.path.join(file_path, self.img_filename_pattern.format(img_num))
-        self.depth_img_filename = os.path.join(file_path, '..\\depths', self.depth_img_filename_pattern.format(img_num))
+        self.depth_img_filename = os.path.join(file_path, '..//depths', self.depth_img_filename_pattern.format(img_num))
         self.output_file_path = output_file_path
         self.rc_pos_filename = os.path.join(file_path, self.rc_pos_filename_pattern.format(img_num))
         self.rc_neg_filename = os.path.join(file_path, self.rc_neg_filename_pattern.format(img_num))
@@ -63,12 +64,13 @@ class GripperDataAugmentation:
         self.output_rc_pos_filename = ''
         self.output_rc_neg_filename = ''
 
-    def randomize(self):
+    def randomize(self, output_file_num):
         self.x_translate = random.randint(-50, 21)
         self.y_translate = random.randint(-20, 51)
         self.rotate_angle = random.randint(0, 360)
         # print(self.x_translate, ' ', self.y_translate, ' ', self.rotate_angle)
-        self.output_img_num = self.img_num + format(random.randint(0, 3000), '04')
+        self.output_img_num = self.img_num + format(output_file_num, '04')
+        print(self.output_img_num)
         self.output_img_filename = os.path.join(self.output_file_path,
                                                  self.img_filename_pattern.format(self.output_img_num))
         self.output_depth_img_filename = os.path.join(self.output_file_path,
@@ -115,16 +117,16 @@ class GripperDataAugmentation:
         new_x = ((self.width - self.init_crop_width) / 2) + self.x_translate
         new_y = ((self.height - self.init_crop_height) / 2) + self.y_translate
 
-        crop_rect = [new_x, new_y, new_x + self.init_crop_width, new_y + self.init_crop_height]
+        crop_rect = [int(new_x),int(new_y), int(new_x + self.init_crop_width), int(new_y + self.init_crop_height)]
         cropped_im = im.crop(crop_rect)
-        rotated_im = cropped_im.rotate(self.rotate_angle, resample=Image.BICUBIC, expand=True)
+        rotated_im = cropped_im.rotate(int(self.rotate_angle), resample=Image.BICUBIC, expand=True)
         # self.show_cropped_rectangle(rotated_im.copy())
 
         w, h = rotated_im.size
         x = (w - self.output_img_width) / 2;
         y = (h - self.output_img_height) / 2;
 
-        output_img = rotated_im.crop((x, y, x + self.output_img_width, y + self.output_img_height))
+        output_img = rotated_im.crop((int(x), int(y), int(x + self.output_img_width), int(y + self.output_img_height)))
 
         [path, file, ext] = self.get_file_parts(output_filename)
         if not os.path.exists(path):
@@ -230,18 +232,18 @@ class GripperDataAugmentation:
 
 def main():
     # create 1000 images per image
-    num_of_images_per_image = 1 #1000
-    num_of_images_per_folder = 1 #100
+    num_of_images_per_image = 1000 #1000
+    num_of_images_per_folder = 100 #100
 
     for folder_num in range(0, 11):
         folder_num_str = format(folder_num, '02')
-        file_path = 'D:\Gali\CS231N_Project\CornellDataset\\' + folder_num_str
-        output_file_path = 'D:\Gali\CS231N_Project\CornellDataset\\data_augmentation\\' + folder_num_str
+        file_path = './/rawDataSet'
+        output_file_path = './/augmentedDataSet//' + folder_num_str
         for img_num in range(0, num_of_images_per_folder):
             img_num_str = folder_num_str + format(img_num, '02')
             myobject = GripperDataAugmentation(file_path, img_num_str, output_file_path);
             for i in range(0, num_of_images_per_image):
-                myobject.randomize()
+                myobject.randomize(i)
                 myobject.data_augment()
 
 if __name__ == "__main__":
